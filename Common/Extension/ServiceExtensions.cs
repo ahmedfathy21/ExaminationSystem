@@ -4,7 +4,6 @@ using ExaminationSystem.Common.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi;
 using Npgsql.EntityFrameworkCore.PostgreSQL;
 
 namespace ExaminationSystem.Common.Extension;
@@ -16,7 +15,7 @@ public static class ServiceExtensions
         services.AddDbContext<AppDbContext>(options =>
             options.UseNpgsql(
                 config.GetConnectionString("DefaultConnection"),
-                npgsql => npgsql.MigrationsAssembly("ExaminationSystem.API")
+                npgsql => npgsql.MigrationsAssembly("ExaminationSystem")
             )
         );
 
@@ -91,28 +90,6 @@ public static class ServiceExtensions
 
     public static IServiceCollection AddSwagger(this IServiceCollection services)
     {
-        services.AddSwaggerGen(c =>
-        {
-            c.SwaggerDoc("v1", new OpenApiInfo
-            {
-                Title = "Examination System API",
-                Version = "v1",
-                Description = "REST API for the Examination System — manages diplomas, quizzes, questions, and student attempts."
-            });
-
-            // JWT support in Swagger UI
-            c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-            {
-                Description = "JWT Authorization header. Enter: Bearer {your_token}",
-                Name = "Authorization",
-                In = ParameterLocation.Header,
-                Type = SecuritySchemeType.ApiKey,
-                Scheme = "Bearer"
-            });
-
-            c.AddSecurityRequirement(doc => new OpenApiSecurityRequirement());
-        });
-
         return services;
     }
 
