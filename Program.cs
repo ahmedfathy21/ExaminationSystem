@@ -14,10 +14,13 @@ builder.Services.AddDatabase(builder.Configuration);
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddAuthorizationPolicies();
 builder.Services.AddEmailSettings(builder.Configuration);
-builder.Services.AddSwagger();
+// builder.Services.AddSwagger();
 // Fluent_validation
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+
+// MediatR
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
 
 // CORS
 builder.Services.AddCors(options =>
@@ -34,10 +37,7 @@ app.UseMiddleware<GlobalExceptionMiddleware>();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(e => { e.SwaggerEndpoint("/swagger/v1/swagger.json", "ExaminationSystem.API v1");
-    e.RoutePrefix = string.Empty;
-});
+    app.MapOpenApi();
 }
 
 app.UseHttpsRedirection();
@@ -51,8 +51,13 @@ if (app.Environment.IsDevelopment())
 {
     using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<ExaminationSystem.Common.Data.AppDbContext>();
-    await db.Database.MigrateAsync();
+    if (db.Database.IsRelational())
+    {
+        await db.Database.EnsureCreatedAsync();
+    }
 }
 
 app.Run();
+
+public partial class Program { }
 

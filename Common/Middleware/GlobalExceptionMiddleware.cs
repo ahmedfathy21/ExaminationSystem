@@ -24,12 +24,19 @@ public class GlobalExceptionMiddleware
         catch (Exception ex)
         {
             _logger.LogError(ex, ex.Message);
-            context.Response.ContentType = "application/json";
+
+            if (context.Response.HasStarted)
+            {
+                throw;
+            }
+
+            await HandleExceptionAsync(context, ex);
         }
     }
 
     private static async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
+        context.Response.Clear();
         context.Response.ContentType = "application/json";
         var (statusCode, response) = exception switch
         {
