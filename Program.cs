@@ -1,6 +1,8 @@
 using ExaminationSystem.Common.Extension;
 using ExaminationSystem.Common.Middleware;
 using FluentValidation;
+using Scalar.AspNetCore;
+using Microsoft.AspNetCore.OpenApi;
 using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -38,7 +40,14 @@ app.UseMiddleware<GlobalExceptionMiddleware>();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.MapScalarApiReference();
 }
+
+app.MapGet("/", () => Results.Ok(new
+{
+    message = "ExaminationSystem API is running.",
+    openApi = app.Environment.IsDevelopment() ? "/openapi/v1.json" : null
+}));
 
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
@@ -53,11 +62,10 @@ if (app.Environment.IsDevelopment())
     var db = scope.ServiceProvider.GetRequiredService<ExaminationSystem.Common.Data.AppDbContext>();
     if (db.Database.IsRelational())
     {
-        await db.Database.EnsureCreatedAsync();
+        await db.Database.MigrateAsync();
     }
 }
 
 app.Run();
 
 public partial class Program { }
-

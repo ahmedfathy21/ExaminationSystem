@@ -71,6 +71,8 @@ public static class ServiceExtensions
                 };
             });
 
+        services.AddScoped<ExaminationSystem.Common.Services.IJwtProvider, ExaminationSystem.Common.Services.JwtProvider>();
+
         return services;
     }
 
