@@ -11,7 +11,7 @@ public class Attempt : BaseEntity
     public DateTime? SubmittedAt { get; set; }
  
     // Navigation
-    public User User { get; set; } = null!;
+    public AppUser? User { get; set; }
     public Quiz Quiz { get; set; } = null!;
     public ICollection<Answer> Answers { get; set; } = new List<Answer>();
     

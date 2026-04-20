@@ -1,12 +1,12 @@
 using ExaminationSystem.Common.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 namespace ExaminationSystem.Common.Data;
 
-public class AppDbContext : DbContext
+public class AppDbContext : IdentityDbContext<AppUser>
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
  
-    public DbSet<User> Users => Set<User>();
     public DbSet<Diploma> Diplomas => Set<Diploma>();
     public DbSet<Quiz> Quizzes => Set<Quiz>();
     public DbSet<Question> Questions => Set<Question>();
@@ -16,23 +16,15 @@ public class AppDbContext : DbContext
  
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(modelBuilder);
- 
-        // ── Users ────────────────────────────────────────────────
-        modelBuilder.Entity<User>(e =>
+base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<AppUser>(e =>
         {
-            e.ToTable("users");
-            e.HasKey(u => u.Id);
-            e.Property(u => u.FullName).IsRequired().HasMaxLength(150);
-            e.Property(u => u.Email).IsRequired().HasMaxLength(255);
-            e.HasIndex(u => u.Email).IsUnique();
-            e.Property(u => u.PasswordHash).IsRequired();
+            e.Property(u => u.FullName).HasMaxLength(150);
             e.Property(u => u.Role).HasConversion<string>();
-            e.Property(u => u.VerificationCode).HasMaxLength(10);
-            e.Property(u => u.CreatedAt).HasDefaultValueSql("NOW()");
-            e.Property(u => u.UpdatedAt).HasDefaultValueSql("NOW()");
+            e.Property(u => u.RefreshToken).HasMaxLength(500);
         });
- 
+
         // ── Diplomas ─────────────────────────────────────────────
         modelBuilder.Entity<Diploma>(e =>
         {
@@ -104,7 +96,7 @@ public class AppDbContext : DbContext
             e.Property(a => a.UpdatedAt).HasDefaultValueSql("NOW()");
  
             e.HasOne(a => a.User)
-             .WithMany(u => u.Attempts)
+             .WithMany()
              .HasForeignKey(a => a.UserId)
              .OnDelete(DeleteBehavior.Restrict);
  
