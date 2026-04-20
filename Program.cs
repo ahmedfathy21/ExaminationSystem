@@ -1,10 +1,16 @@
+using ExaminationSystem.Common.Data;
 using ExaminationSystem.Common.Extension;
 using ExaminationSystem.Common.Middleware;
+using ExaminationSystem.Common.Models;
+using ExaminationSystem.Common.Repositories;
+using ExaminationSystem.Common.Services;
 using FluentValidation;
 using Scalar.AspNetCore;
 using Microsoft.AspNetCore.OpenApi;
 using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +29,25 @@ builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
 // MediatR
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+
+// Identity
+builder.Services.AddIdentityCore<AppUser>(options =>
+{
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireUppercase = true;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequiredLength = 8;
+    options.User.RequireUniqueEmail = true;
+})
+.AddEntityFrameworkStores<AppDbContext>()
+.AddDefaultTokenProviders();
+
+// Unit of Work
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+// Email Confirmation Helper
+builder.Services.AddScoped<IEmailConfirmationHelper, EmailConfirmationHelper>();
 
 // CORS
 builder.Services.AddCors(options =>

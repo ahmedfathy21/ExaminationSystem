@@ -2,7 +2,7 @@ namespace ExaminationSystem.Common.Models;
 
 public class Attempt : BaseEntity
 {
-    public Guid UserId { get; set; }
+    public string UserId { get; set; } = string.Empty;
     public Guid QuizId { get; set; }
     public int Score { get; set; } = 0;
     public int TotalQuestions { get; set; } = 0;

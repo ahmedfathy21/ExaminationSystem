@@ -17,7 +17,7 @@ public class JwtProvider : IJwtProvider
         _jwtSettings = jwtSettings.Value;
     }
 
-    public string GenerateAccessToken(User user)
+    public string GenerateAccessToken(AppUser user)
     {
         var claims = new[]
         {
