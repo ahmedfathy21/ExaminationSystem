@@ -30,23 +30,20 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
         return await _dbSet.Where(predicate).ToListAsync();
     }
 
-    public async Task<T> AddAsync(T entity)
+    public void Add(T entity)
     {
-        await _dbSet.AddAsync(entity);
-        await _context.SaveChangesAsync();
-        return entity;
+        _dbSet.Add(entity);
+        
     }
 
-    public async Task UpdateAsync(T entity)
+    public void Update(T entity)
     {
         _dbSet.Update(entity);
-        await _context.SaveChangesAsync();
     }
 
-    public async Task DeleteAsync(T entity)
+    public void Delete(T entity)
     {
         _dbSet.Remove(entity);
-        await _context.SaveChangesAsync();
     }
 
     public async Task<bool> ExistsAsync(Guid id)
