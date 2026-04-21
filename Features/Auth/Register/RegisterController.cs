@@ -1,5 +1,6 @@
 using ExaminationSystem.Common.Wrappers;
 using ExaminationSystem.Features.Auth.Register;
+using ExaminationSystem.Features.Auth.Register.DTOs;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,8 +18,9 @@ public class RegisterController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<ApiResponse<RegisterResponse>>> Register([FromBody] RegisterCommand command)
+    public async Task<ActionResult<ApiResponse<RegisterResponse>>> Register([FromBody] RegisterRequest request)
     {
+        var command = new RegisterCommand(request);
         var result = await _mediator.Send(command);
         
         if (!result.Success)
