@@ -4,11 +4,11 @@ namespace ExaminationSystem.Common.Repositories;
 
 public interface IGenericRepository<T> where T : class
 {
-    Task<T?> GetByIdAsync(Guid id);
-    Task<IEnumerable<T>> GetAllAsync();
-    Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate);
+    Task<T?> GetByIdAsync(object id);
+    IQueryable<T> GetAll();
+    IQueryable<T> Find(Expression<Func<T, bool>> predicate);
     void Add(T entity);
     void Update(T entity);
     void Delete(T entity);
-    Task<bool> ExistsAsync(Guid id);
+    Task<bool> ExistsAsync(object id);
 }

@@ -15,25 +15,24 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
         _dbSet = context.Set<T>();
     }
 
-    public virtual async Task<T?> GetByIdAsync(Guid id)
+    public virtual async Task<T?> GetByIdAsync(object id)
     {
         return await _dbSet.FindAsync(id);
     }
 
-    public async Task<IEnumerable<T>> GetAllAsync()
+    public IQueryable<T> GetAll()
     {
-        return await _dbSet.ToListAsync();
+        return _dbSet.AsQueryable();
     }
 
-    public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
+    public IQueryable<T> Find(Expression<Func<T, bool>> predicate)
     {
-        return await _dbSet.Where(predicate).ToListAsync();
+        return _dbSet.Where(predicate);
     }
 
     public void Add(T entity)
     {
         _dbSet.Add(entity);
-        
     }
 
     public void Update(T entity)
@@ -46,7 +45,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
         _dbSet.Remove(entity);
     }
 
-    public async Task<bool> ExistsAsync(Guid id)
+    public async Task<bool> ExistsAsync(object id)
     {
         var entity = await _dbSet.FindAsync(id);
         return entity != null;
