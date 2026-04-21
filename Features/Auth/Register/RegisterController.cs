@@ -23,11 +23,6 @@ public class RegisterController : ControllerBase
         var command = new RegisterCommand(request);
         var result = await _mediator.Send(command);
         
-        if (!result.Success)
-        {
-            return BadRequest(ApiResponse<RegisterResponse>.Fail(result.Message));
-        }
-
-        return Ok(ApiResponse<RegisterResponse>.Ok(result));
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 }

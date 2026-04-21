@@ -1,5 +1,6 @@
 using ExaminationSystem.Common.Models;
 using ExaminationSystem.Common.Services;
+using ExaminationSystem.Common.Wrappers;
 using ExaminationSystem.Features.Auth.Register;
 using ExaminationSystem.Features.Auth.Register.DTOs;
 using MediatR;
@@ -7,7 +8,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace ExaminationSystem.Features.Auth.Register;
 
-public class RegisterCommandHandler : IRequestHandler<RegisterCommand, RegisterResponse>
+public class RegisterCommandHandler : IRequestHandler<RegisterCommand, ApiResponse<RegisterResponse>>
 {
     private readonly UserManager<AppUser> _userManager;
     private readonly IEmailService _emailService;
@@ -23,12 +24,12 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, RegisterR
         _emailConfirmationHelper = emailConfirmationHelper;
     }
 
-    public async Task<RegisterResponse> Handle(RegisterCommand request, CancellationToken cancellationToken)
+    public async Task<ApiResponse<RegisterResponse>> Handle(RegisterCommand request, CancellationToken cancellationToken)
     {
         var existingUser = await _userManager.FindByEmailAsync(request.Request.Email);
         if (existingUser != null)
         {
-            return RegisterResponse.Failure("Email already registered");
+            return ApiResponse<RegisterResponse>.Fail("Email already registered");
         }
 
         var user = new AppUser
@@ -44,7 +45,7 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, RegisterR
         if (!result.Succeeded)
         {
             var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-            return RegisterResponse.Failure($"Failed to create user: {errors}");
+            return ApiResponse<RegisterResponse>.Fail($"Failed to create user: {errors}");
         }
 
         var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -56,6 +57,7 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, RegisterR
             $"<h1>Email Confirmation</h1><p>Click <a href=\"{confirmationLink}\">here</a> to confirm your email.</p>"
         );
 
-        return RegisterResponse.SuccessResponse(user.Id);
+        var response = new RegisterResponse { UserId = user.Id };
+        return ApiResponse<RegisterResponse>.Ok(response);
     }
 }
