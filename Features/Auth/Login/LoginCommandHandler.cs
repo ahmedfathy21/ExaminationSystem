@@ -12,15 +12,21 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, ApiResponse<Log
     private readonly UserManager<AppUser> _userManager;
     private readonly SignInManager<AppUser> _signInManager;
     private readonly IJwtProvider _jwtProvider;
+    private readonly IOtpService _otpService;
+    private readonly IEmailService _emailService;
 
     public LoginCommandHandler(
         UserManager<AppUser> userManager,
         SignInManager<AppUser> signInManager,
-        IJwtProvider jwtProvider)
+        IJwtProvider jwtProvider,
+        IOtpService otpService,
+        IEmailService emailService)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _jwtProvider = jwtProvider;
+        _otpService = otpService;
+        _emailService = emailService;
     }
 
     public async Task<ApiResponse<LoginResponse>> Handle(LoginCommand request, CancellationToken cancellationToken)
@@ -30,7 +36,21 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, ApiResponse<Log
             return ApiResponse<LoginResponse>.Fail("Invalid email or password");
 
         if (!user.EmailConfirmed)
-            return ApiResponse<LoginResponse>.Fail("Please confirm your email before logging in");
+        {
+            var otp = _otpService.GenerateOtp();
+            user.VerificationOtp = otp;
+            user.VerificationOtpExpiresAt = DateTime.UtcNow.AddMinutes(10);
+            user.VerificationOtpAttempts = 0;
+            await _userManager.UpdateAsync(user);
+
+            await _emailService.SendEmailAsync(
+                user.Email!,
+                "Verify your account",
+                $"<h1>Account Verification</h1><p>Your verification code is: <strong>{otp}</strong></p><p>This code will expire in 10 minutes.</p>"
+            );
+
+            return ApiResponse<LoginResponse>.Fail("Please verify your email. A verification code has been sent.");
+        }
 
         var result = await _signInManager.PasswordSignInAsync(
             user,
