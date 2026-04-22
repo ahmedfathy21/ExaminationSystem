@@ -99,6 +99,7 @@ public static class ServiceExtensions
     {
         services.Configure<EmailSettings>(config.GetSection("EmailSettings"));
         services.AddTransient<ExaminationSystem.Common.Services.IEmailService, ExaminationSystem.Common.Services.EmailService>();
+        services.AddScoped<ExaminationSystem.Common.Services.IOtpService, ExaminationSystem.Common.Services.OtpService>();
         return services;
     }
 }
