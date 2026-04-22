@@ -4,4 +4,4 @@ using MediatR;
 
 namespace ExaminationSystem.Features.Auth.Login;
 
-public record LoginCommand(LoginRequest Request) : IRequest<ApiResponse<LoginResponse>>;
+public record RefreshTokenCommand(RefreshTokenRequest Request) : IRequest<ApiResponse<RefreshTokenResponse>>;
