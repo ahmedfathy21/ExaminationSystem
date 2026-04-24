@@ -1,10 +1,35 @@
 using System.Net;
 using System.Net.Mail;
-using System.Threading.Tasks;
 using ExaminationSystem.Common.Models;
 using Microsoft.Extensions.Options;
 
 namespace ExaminationSystem.Common.Services;
+
+public class MockEmailService : IEmailService
+{
+    public static List<EmailMessage> SentEmails = new();
+
+    public Task SendEmailAsync(string toEmail, string subject, string body)
+    {
+        SentEmails.Add(new EmailMessage
+        {
+            ToEmail = toEmail,
+            Subject = subject,
+            Body = body,
+            SentAt = DateTime.UtcNow
+        });
+        Console.WriteLine($"[MOCK EMAIL] To: {toEmail}, Subject: {subject}");
+        return Task.CompletedTask;
+    }
+}
+
+public class EmailMessage
+{
+    public string ToEmail { get; set; } = string.Empty;
+    public string Subject { get; set; } = string.Empty;
+    public string Body { get; set; } = string.Empty;
+    public DateTime SentAt { get; set; }
+}
 
 public class EmailService : IEmailService
 {

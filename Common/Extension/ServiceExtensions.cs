@@ -69,6 +69,12 @@ public static class ServiceExtensions
                         );
                     }
                 };
+            })
+            .AddCookie("Identity.Application", options =>
+            {
+                options.Cookie.Name = "Identity.Application";
+                options.LoginPath = "/api/auth/login";
+                options.AccessDeniedPath = "/api/auth/access-denied";
             });
 
         services.AddScoped<ExaminationSystem.Common.Services.IJwtProvider, ExaminationSystem.Common.Services.JwtProvider>();

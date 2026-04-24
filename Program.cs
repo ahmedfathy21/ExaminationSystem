@@ -22,6 +22,10 @@ builder.Services.AddDatabase(builder.Configuration);
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddAuthorizationPolicies();
 builder.Services.AddEmailSettings(builder.Configuration);
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddSingleton<IEmailService, MockEmailService>();
+}
 // builder.Services.AddSwagger();
 // Fluent_validation
 builder.Services.AddFluentValidationAutoValidation();
@@ -42,6 +46,9 @@ builder.Services.AddIdentityCore<AppUser>(options =>
 })
 .AddEntityFrameworkStores<AppDbContext>()
 .AddDefaultTokenProviders();
+
+builder.Services.AddScoped<SignInManager<AppUser>>();
+builder.Services.AddHttpContextAccessor();
 
 // Unit of Work
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -83,11 +90,18 @@ app.UseAuthorization();
 app.MapControllers();
 if (app.Environment.IsDevelopment())
 {
-    using var scope = app.Services.CreateScope();
-    var db = scope.ServiceProvider.GetRequiredService<ExaminationSystem.Common.Data.AppDbContext>();
-    if (db.Database.IsRelational())
+    try
     {
-        await db.Database.MigrateAsync();
+        using var scope = app.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<ExaminationSystem.Common.Data.AppDbContext>();
+        if (db.Database.IsRelational())
+        {
+            await db.Database.MigrateAsync();
+        }
+    }
+    catch
+    {
+        Console.WriteLine("Migrations already applied or tables exist.");
     }
 }
 
