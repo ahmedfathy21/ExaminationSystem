@@ -3,10 +3,20 @@ using ExaminationSystem.Common.Wrappers;
 using ExaminationSystem.Features.Quiz.DTOs;
 using MediatR;
 using ExaminationSystem.Common.Models;
+using FluentValidation;
+
 namespace ExaminationSystem.Features.Quiz;
 
 public record GetQuizQuery(Guid Id) : IRequest<ApiResponse<QuizDetailsResponse>>;
 
+public class GetQuizQueryValidator : AbstractValidator<GetQuizQuery>
+{
+    public GetQuizQueryValidator()
+    {
+        RuleFor(x => x.Id)
+            .NotEmpty().WithMessage("Id is required");
+    }   
+}
 public class GetQuizQueryHandler : IRequestHandler<GetQuizQuery,ApiResponse<QuizDetailsResponse>>
 {
     private readonly IUnitOfWork _unitOfWork;
