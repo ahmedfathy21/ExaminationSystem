@@ -7,6 +7,7 @@ public class Quiz :BaseEntity
     public string? Instructions { get; set; }
     public int DurationMinutes { get; set; }
     public int PassScore { get; set; }
+    public int MaxAttempts { get; set; } = 3;
     public QuizStatus Status { get; set; } = QuizStatus.Draft;
     public DateTime? PublishedAt { get; set; }
  

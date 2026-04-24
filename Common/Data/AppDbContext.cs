@@ -45,6 +45,7 @@ base.OnModelCreating(modelBuilder);
             e.Property(q => q.Status).HasConversion<string>();
             e.Property(q => q.DurationMinutes).IsRequired();
             e.Property(q => q.PassScore).IsRequired();
+            e.Property(q => q.MaxAttempts).IsRequired().HasDefaultValue(3);
             e.Property(q => q.CreatedAt).HasDefaultValueSql("NOW()");
             e.Property(q => q.UpdatedAt).HasDefaultValueSql("NOW()");
  
