@@ -40,7 +40,7 @@ public class DevController : ControllerBase
         };
         _context.Diplomas.Add(diploma);
 
-        var quiz = new Quiz
+        var quiz = new Common.Models.Quiz
         {
             Id = Guid.NewGuid(),
             DiplomaId = diploma.Id,
