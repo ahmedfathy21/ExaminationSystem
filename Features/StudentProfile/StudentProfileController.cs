@@ -30,4 +30,17 @@ public class StudentProfileController : ControllerBase
 
         return result.Success ? Ok(result) : BadRequest(result);
     }
+
+    [HttpGet("dashboard")]
+    public async Task<ActionResult<ApiResponse<StudentDashboardResponse>>> GetDashboard()
+    {
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (userId == null)
+            return Unauthorized(ApiResponse<StudentDashboardResponse>.Fail("Unauthorized"));
+
+        var query = new GetStudentDashboardQuery(userId);
+        var result = await _mediator.Send(query);
+
+        return result.Success ? Ok(result) : BadRequest(result);
+    }
 }
